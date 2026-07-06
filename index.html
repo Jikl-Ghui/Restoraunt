@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>"Ұлмекен" асханасы</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Montserrat:wght@400;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .handwritten {
+            font-family: 'Caveat', cursive;
+        }
+    </style>
+</head>
+
+<body class="bg-amber-50 text-stone-800 min-h-screen pb-12">
+
+    <header class="text-center py-12 px-4 bg-white shadow-sm border-b border-amber-100 rounded-b-3xl">
+        <span class="handwritten text-4xl text-amber-600 block mb-2">"Ұлмекен" асханасы</span>
+        <h1 class="text-3xl font-bold tracking-tight text-stone-950 uppercase">Анамның шедеврлері</h1>
+        <div class="w-16 h-1 bg-amber-400 mx-auto mt-4 rounded-full"></div>
+        <p class="text-sm text-stone-500 mt-3 italic">Құштарлықпен және махаббатпен жасалған! </p>
+    </header>
+
+    <nav class="max-w-md mx-auto my-6 px-4">
+        <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-none justify-start sm:justify-center" id="category-nav">
+            <button onclick="filterCategory('all')" id="btn-all"
+                class="bg-amber-500 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-xs whitespace-nowrap cursor-pointer transition">Барлық
+                меню</button>
+            <button onclick="filterCategory('breakfast')" id="btn-breakfast"
+                class="bg-white text-stone-600 border border-stone-200 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap cursor-pointer transition hover:bg-amber-100">Ыстық
+                тағамдар</button>
+            <button onclick="filterCategory('additional')" id="btn-additional"
+                class="bg-white text-stone-600 border border-stone-200 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap cursor-pointer transition hover:bg-amber-100">Қосымша
+                тағамдар</button>
+            <button onclick="filterCategory('salads')" id="btn-salads"
+                class="bg-white text-stone-600 border border-stone-200 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap cursor-pointer transition hover:bg-amber-100">Салаттар</button>
+            <button onclick="filterCategory('drinks')" id="btn-drinks"
+                class="bg-white text-stone-600 border border-stone-200 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap cursor-pointer transition hover:bg-amber-100">Сусындар</button>
+        </div>
+    </nav>
+
+    <main class="max-w-md mx-auto px-4 grid gap-6" id="menu-container"></main>
+
+    <script>
+
+        const TG_TOKEN = '' //token of telegram bot that will send message to your chat;
+        const TG_CHAT_ID = ''; //id of user that message need to be sent to
+
+        const DISHES = [
+            {
+                category: 'breakfast',
+                title: 'Қуырдақ',
+                price: '1971 тг',
+                description: 'Ыстық, дәмді әрі өте жұмсақ еттен дайындалған дәстүрлі қуырдақ.',
+                secret: 'Махаббатпен қуырылған',
+                image: 'images/quyrdaq.jpg'
+            },
+            {
+                category: 'breakfast',
+                title: 'Манты',
+                price: '2003 тг',
+                description: 'Жұқа қамыр, шырынды ет пен пияздың керемет үйлесімі. Буда піскен.',
+                secret: 'Қолдан жасалған аджикамен',
+                image: 'images/manty.jpg'
+            },
+            {
+                category: 'additional',
+                title: 'Бауырсақ',
+                price: '03.04 тг/дана',
+                description: 'Үлпілдек, алтын түстес ыстық бауырсақтар. Кез келген дастарханның сәні.',
+                secret: 'Қолдан жасалған аджикамен',
+                image: 'images/bauyrsaq.jpg'
+            },
+            {
+                category: 'additional',
+                title: 'Маммаритта',
+                price: '1969 тг',
+                description: 'Помидоры, сыр, кетчуп',
+                secret: 'Нежное тесто',
+                image: 'images/pizza.jpg'
+            },
+            {
+                category: 'breakfast',
+                title: 'Макароны',
+                price: '1992 тг',
+                description: 'заменить',
+                secret: 'замена',
+                image: 'images/makaron.jpg'
+            },
+            {
+                category: 'breakfast',
+                title: 'Шапка тамақ',
+                price: '06.22 тг/дана',
+                description: 'Пельмени',
+                secret: 'Қолдан жасалған',
+                image: 'images/pelmen.jpg'
+            },
+            {
+                category: 'salads',
+                title: 'Раянаның салаты',
+                price: '1969 тг',
+                description: 'заменить',
+                secret: 'замена',
+                image: 'images/Rayana.jpg'
+            },
+            {
+                category: 'breakfast',
+                title: 'Бешбармақ',
+                price: '1992 тг',
+                description: 'заменить',
+                secret: 'замена',
+                image: 'images/beshbarmaq.jpg'
+            },
+            {
+                category: 'drinks',
+                title: 'Шәй',
+                price: '1969 тг',
+                description: 'заменить',
+                secret: 'замена',
+                image: 'images/shai.jpg'
+            },
+            {
+                category: 'drinks',
+                title: 'Компот',
+                price: '1969 тг',
+                description: 'заменить',
+                secret: 'Қолдан жасалған',
+                image: 'images/kompot2.jpg'
+            },
+            {
+                category: 'drinks',
+                title: 'Кола',
+                price: '1969 тг',
+                description: 'заменить',
+                secret: 'Магазин',
+                image: 'images/kola.jpg'
+            },
+            {
+                category: 'drinks',
+                title: 'Су',
+                price: 'бағасы: жылы сөз',
+                description: 'Ең күшті сусын',
+                secret: 'Таза су',
+                image: 'images/water.jpg'
+            },
+            {
+                category: 'salads',
+                title: 'Классический салат',
+                price: '1969 тг',
+                description: 'Помидор, қияр, майонез',
+                secret: 'Простота',
+                image: 'images/salat.jpg'
+            },
+            {
+                category: 'breakfast',
+                title: 'Тауық пен картошка',
+                price: '1969 тг',
+                description: 'заменить',
+                secret: 'замена',
+                image: 'images/tauyq.jpg'
+            },
+            {
+                category: 'salads',
+                title: 'Цезарь',
+                price: '1969 тг',
+                description: 'заменить',
+                secret: 'замена',
+                image: 'images/pizza.jpg'
+            },
+            {
+                category: 'salads',
+                title: 'Греческий салат',
+                price: '1969 тг',
+                description: 'заменить',
+                secret: 'замена',
+                image: 'images/brynza.jpg'
+            },
+            {
+                category: 'additional',
+                title: 'Самса',
+                price: '20.06 тг',
+                description: 'заменить',
+                secret: 'замена',
+                image: 'images/samsa.jpg'
+            },
+            {
+                category: 'drinks',
+                title: 'Лимонад',
+                price: '20.06 тг',
+                description: 'заменить',
+                secret: 'замена',
+                image: 'images/limonad.jpg'
+            }
+
+        ];
+        
+
+        function renderMenu(items) {
+            const container = document.getElementById('menu-container');
+            container.innerHTML = '';
+
+            if (items.length === 0) {
+                container.innerHTML = `<p class="text-center text-stone-400 my-8">Бұл бөлімде әлі тағамдар жоқ...</p>`;
+                return;
+            }
+
+            items.forEach(dish => {
+                const card = `
+                    <div class="menu-item bg-white rounded-2xl overflow-hidden shadow-md border border-stone-100 transition duration-300">
+                        <img src="${dish.image}" alt="${dish.title}" class="w-full h-48 object-cover">
+                        <div class="p-5">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="text-xl font-bold text-stone-900">${dish.title}</h3>
+                                <span class="text-amber-600 font-bold handwritten text-2xl">${dish.price}</span>
+                            </div>
+                            <p class="text-sm text-stone-600 mb-4">${dish.description}</p>
+                            <div class="flex justify-between items-center border-t border-stone-100 pt-3 text-xs text-stone-400">
+                                <span>Секрет: ${dish.secret}</span>
+                                <button onclick="orderDish('${dish.title}')"
+                                    class="bg-stone-900 text-white px-3 py-1.5 rounded-xl font-semibold cursor-pointer hover:bg-amber-600 transition">Заказ беру!</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += card;
+            });
+        }
+
+        function filterCategory(category) {
+            const buttons = document.querySelectorAll('#category-nav button');
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-amber-500', 'text-white');
+                btn.classList.add('bg-white', 'text-stone-600', 'border', 'border-stone-200');
+            });
+
+            if (event && event.target) {
+                event.target.classList.remove('bg-white', 'text-stone-600', 'border', 'border-stone-200');
+                event.target.classList.add('bg-amber-500', 'text-white');
+            }
+
+            if (category === 'all') {
+                renderMenu(DISHES);
+            } else {
+                const filtered = DISHES.filter(dish => dish.category === category);
+                renderMenu(filtered);
+            }
+        }
+
+        function orderDish(name) {
+            const text = `🔔 *Кухняға жаңа заказ!*\n\n🥗 Тағам: *${name}*\n📍 Қайдан: Қонақтардан\n`;
+            const url = `https://api.telegram.org/bot${TG_TOKEN}/sendMessage`;
+
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: TG_CHAT_ID,
+                    text: text,
+                    parse_mode: 'Markdown'
+                })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        showAlert(
+                            `Ас дәмді болсын! 👨‍🍳`,
+                            `"${name}" тапсырысы анама сәтті жіберілді! Жақында дайын болады 😉`
+                        );
+                    } else {
+                        showAlert(`Ойбуй! 😢`, `Тапсырыс жіберілмеді. Тексеріп көріңіз.`);
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                    showAlert(`Желілік қате 🔌`, `Анамды барып құшақтай салатын кез келген сияқты!`);
+                });
+        }
+
+
+        function showAlert(title, message) {
+            const modal = document.getElementById('custom-alert');
+            const card = document.getElementById('alert-card');
+
+            document.getElementById('alert-title').innerText = title;
+            document.getElementById('alert-message').innerText = message;
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                card.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeAlert() {
+            const modal = document.getElementById('custom-alert');
+            const card = document.getElementById('alert-card');
+
+            modal.classList.add('opacity-0');
+            card.classList.add('scale-95');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        renderMenu(DISHES);
+    </script>
+
+    <div id="custom-alert"
+        class="fixed inset-0 bg-stone-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-3xl p-6 max-w-sm w-full text-center shadow-xl border border-amber-100 transform scale-95 transition-transform duration-300"
+            id="alert-card">
+            <div
+                class="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                ✨
+            </div>
+            <h3 class="text-xl font-bold text-stone-900 mb-2" id="alert-title">Тамаша!</h3>
+            <p class="text-sm text-stone-600 mb-6" id="alert-message">Тағам шеф-аспазға жіберілді.</p>
+            <button onclick="closeAlert()"
+                class="w-full bg-stone-900 text-white py-3 rounded-2xl font-semibold shadow-md hover:bg-amber-600 cursor-pointer transition active:scale-98">
+                Жақсы
+            </button>
+        </div>
+    </div>
+</body>
+
+</html>
